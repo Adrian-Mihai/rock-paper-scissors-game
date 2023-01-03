@@ -49,6 +49,10 @@ class Player
     x < (player.x + player.width) && (x + width) > player.x && y < (player.y + player.height) && (y + height) > player.y
   end
 
+  def ally?(player)
+    @type == player.type
+  end
+
   def beat?(player)
     return true if (@type == ROCK && player.type == SCISSOR) || (@type == SCISSOR && player.type == PAPER) || (@type == PAPER && player.type == ROCK)
 

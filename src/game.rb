@@ -12,7 +12,7 @@ class Game
     @start = false
     @players = []
     build_players
-    @search = Search.new(nil, @players)
+    @search = Search.new(nil, nil)
     @collision_detection = CollisionDetection.new(nil)
   end
 
@@ -25,11 +25,13 @@ class Game
       collided_players.each { |collided_player| current_player.beat?(collided_player) ? collided_player.type = current_player.type : current_player.type = collided_player.type }
 
       @search.player = current_player
+      @search.players = other_players
       @collision_detection.player = current_player
 
       direction = @search.perform
       direction = @collision_detection.change_direction if @collision_detection.player_collide_wall?
-      direction = current_player.direction if direction.nil?
+      direction = current_player.direction if direction.nil? && game_ended?
+      next if direction.nil?
 
       current_player.direction = direction
       current_player.move
@@ -44,7 +46,6 @@ class Game
     @players.each { |player| player.remove }
     @players = []
     build_players
-    @search.players = @players
   end
 
   private
@@ -57,5 +58,13 @@ class Game
     number.times { @players << Player.new(Player::ROCK, width.sample, height.sample, Direction.all.sample) }
     number.times { @players << Player.new(Player::PAPER, width.sample, height.sample, Direction.all.sample) }
     number.times { @players << Player.new(Player::SCISSOR, width.sample, height.sample, Direction.all.sample) }
+  end
+
+  def game_ended?
+    rock_players_count = @players.count { |player| player.type == Player::ROCK }
+    paper_players_count = @players.count { |player| player.type == Player::PAPER }
+    scissor_players_count = @players.count { |player| player.type == Player::SCISSOR }
+
+    rock_players_count == @players_count || paper_players_count == @players_count || scissor_players_count == @players_count
   end
 end

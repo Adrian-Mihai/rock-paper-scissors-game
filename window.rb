@@ -11,7 +11,7 @@ set background: 'navy'
 
 fps = Text.new('FPS:', x: (get :width) - 85, y: 5, size: 15, color: 'silver')
 
-game = Game.new(120)
+game = Game.new(150)
 
 on :key_down do |event|
   case event.key
