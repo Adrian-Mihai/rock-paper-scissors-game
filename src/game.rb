@@ -1,5 +1,6 @@
 require_relative 'player'
 require_relative 'search'
+require_relative 'collision_detection'
 
 class Game
   OFFSET = 35
@@ -12,6 +13,7 @@ class Game
     @players = []
     build_players
     @search = Search.new(nil, @players)
+    @collision_detection = CollisionDetection.new(nil)
   end
 
   def run
@@ -23,12 +25,14 @@ class Game
       collided_players.each { |collided_player| current_player.beat?(collided_player) ? collided_player.type = current_player.type : current_player.type = collided_player.type }
 
       @search.player = current_player
-      direction = @search.perform
-      next if direction.nil?
+      @collision_detection.player = current_player
 
-      current_player.x += direction.x
-      current_player.y += direction.y
-      current_player.image.rotate = direction.rotate
+      direction = @search.perform
+      direction = @collision_detection.change_direction if @collision_detection.player_collide_wall?
+      direction = current_player.direction if direction.nil?
+
+      current_player.direction = direction
+      current_player.move
     end
   end
 
@@ -37,7 +41,7 @@ class Game
   end
 
   def reset
-    @players.each { |player| player.image.remove }
+    @players.each { |player| player.remove }
     @players = []
     build_players
     @search.players = @players
@@ -50,8 +54,8 @@ class Game
     width = (OFFSET..(Window.width - OFFSET)).to_a
     height = (OFFSET..(Window.height - OFFSET)).to_a
 
-    number.times { @players << Player.new(Player::ROCK, width.sample, height.sample) }
-    number.times { @players << Player.new(Player::PAPER, width.sample, height.sample) }
-    number.times { @players << Player.new(Player::SCISSOR, width.sample, height.sample) }
+    number.times { @players << Player.new(Player::ROCK, width.sample, height.sample, Direction.all.sample) }
+    number.times { @players << Player.new(Player::PAPER, width.sample, height.sample, Direction.all.sample) }
+    number.times { @players << Player.new(Player::SCISSOR, width.sample, height.sample, Direction.all.sample) }
   end
 end

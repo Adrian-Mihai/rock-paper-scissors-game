@@ -4,29 +4,27 @@ class Player
   SCISSOR = 'scissor'.freeze
   IMAGE_PATH = 'assets/images'
 
-  attr_reader :type, :x, :y, :image
+  attr_accessor :direction
+  attr_reader :type
 
-  def initialize(type, x, y)
+  def initialize(type, x, y, direction)
     @type = type
-    @x = x
-    @y = y
-    @image = Image.new("#{IMAGE_PATH}/#{type}.png", x: x, y: y)
+    @direction = direction
+    @image = Image.new("#{IMAGE_PATH}/#{type}.png", x: x, y: y, rotate: direction.rotate)
   end
 
   def type=(type)
     @type = type
     @image.remove
-    @image = Image.new("#{IMAGE_PATH}/#{type}.png", x: @x, y: @y)
+    @image = Image.new("#{IMAGE_PATH}/#{type}.png", x: x, y: y)
   end
 
-  def x=(value)
-    @x = value
-    @image.x = value
+  def x
+    @image.x
   end
 
-  def y=(value)
-    @y = value
-    @image.y = value
+  def y
+    @image.y
   end
 
   def width
@@ -37,8 +35,18 @@ class Player
     @image.height
   end
 
+  def remove
+    @image.remove
+  end
+
+  def move
+    @image.x += @direction.x
+    @image.y += @direction.y
+    @image.rotate = @direction.rotate
+  end
+
   def collide?(player)
-    @x < (player.x + player.width) && (@x + width) > player.x && @y < (player.y + player.height) && (@y + height) > player.y
+    x < (player.x + player.width) && (x + width) > player.x && y < (player.y + player.height) && (y + height) > player.y
   end
 
   def beat?(player)
